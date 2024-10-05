@@ -75,7 +75,7 @@ const displayVideos = (videos) =>{
                 <h2 class="font-bold"> ${video.title} </h2>
                 <div class="flex gap-2 items-center" >
                     <p> ${video.authors[0].profile_name}</p>
-                    <img src="${video.authors[0].verified}" />
+                    <img class="h-5 w-5" src="https://img.icons8.com/?size=48&id=D9RtvkuOe31p&format=png" />
                 </div>
                 <p> ${video.others.views} </p>
            </div>
