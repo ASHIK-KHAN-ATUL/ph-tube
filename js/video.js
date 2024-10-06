@@ -7,6 +7,14 @@ function getTimeString(time){
 }
 
 
+const removeActiveclass = () => {
+    const buttons = document.getElementsByClassName('category-btn');
+    for(let btn of buttons){
+        btn.classList.remove('active')
+    }
+}
+
+
 // fetch , catagory and show
 
 // Create loadCategories
@@ -19,9 +27,9 @@ const loadCategories = () => {
 }
 
 // load videos
-const loadVideos = () => {
+const loadVideos = (searchText = "") => {
     // fetch data
-    fetch('https://openapi.programming-hero.com/api/phero-tube/videos')
+    fetch(`https://openapi.programming-hero.com/api/phero-tube/videos?title=${searchText}`)
     .then(res => res.json())
     .then(data => displayVideos(data.videos))
     .catch((error) => console.log(error));
@@ -33,9 +41,40 @@ const loadCategoryVideos = (id) => {
     // fetch
     fetch(`https://openapi.programming-hero.com/api/phero-tube/category/${id}`)
     .then(res => res.json())
-    .then(data => displayVideos(data.category))
+    .then(data => {
+        // all button remove active class
+        removeActiveclass();
+
+        // id er class k active koro
+        const activeBtn = document.getElementById(`btn-${id}`);
+        activeBtn.classList.add('active')
+        displayVideos(data.category);
+    } )
     .catch((error) => console.log(error));
-}
+};
+
+const loadDetails = async(videoId) =>{
+    console.log(videoId);
+    const url = `https://openapi.programming-hero.com/api/phero-tube/video/${videoId}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    displayDetails(data.video);
+};
+const displayDetails = (video) => {
+    console.log(video);
+    const detailsContainer = document.getElementById('modal-content');
+
+    detailsContainer.innerHTML = `
+    <div class=" space-y-6">
+        <img src=" ${video.thumbnail}" />
+        <h3 class="font-bold " > ${video.title} </h3>
+        <p class="text-xs text-black"> ${video.description} </p>
+    </div>
+    `
+
+    document.getElementById('showModalData').click();
+
+};
 
 
 
@@ -53,7 +92,7 @@ const displayCategories = (categories) => {
         const buttonContainer = document.createElement("div");
         buttonContainer.innerHTML = 
         `
-        <button onclick=" loadCategoryVideos(${item.category_id}) " class="btn " > ${item.category} </button>
+        <button id="btn-${item.category_id}" onclick=" loadCategoryVideos(${item.category_id}) " class="btn category-btn" > ${item.category} </button>
         `
         // add button to categories container
         categoryContainer.appendChild(buttonContainer)
@@ -89,6 +128,19 @@ const displayCategories = (categories) => {
 const displayVideos = (videos) =>{
     const videoConatiner = document.getElementById('videos')
     videoConatiner.innerHTML = "";
+
+    if(videos.length == 0 ){
+        videoConatiner.classList.remove('grid')
+        videoConatiner.innerHTML = ` <div class=" space-y-5 min-h-[300px] flex flex-col gap-5 justify-center items-center ">
+            <img src="assets/Icon.png" />
+            <h2 class="font-bold text-center text-xl">No Content Avaible In This Category </h2>
+        </div> `;
+        return;
+    }
+    else{
+        videoConatiner.classList.add('grid')
+    }
+
     videos.forEach((video) => {
         console.log(video);
         const card = document.createElement('div');
@@ -112,8 +164,11 @@ const displayVideos = (videos) =>{
                     
                     ${video.authors[0].verified === true ? `<img class="h-5 w-5" src="https://img.icons8.com/?size=48&id=D9RtvkuOe31p&format=png" />` : ""}
 
+                </div >
+                <div class=" flex space-x-24"> 
+                    <p> ${video.others.views} </p>
+                <button onclick="loadDetails( '${video.video_id}' )" class="btn btn-sm btn-error"> Details </button> 
                 </div>
-                <p> ${video.others.views} </p>
            </div>
             
         </div>
@@ -127,6 +182,9 @@ const displayVideos = (videos) =>{
 
 
 
+document.getElementById('search-input').addEventListener("keyup", (e)=>{
+    loadVideos(e.target.value);
+})
 
 loadCategories();
 loadVideos();
