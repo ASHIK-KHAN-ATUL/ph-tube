@@ -101,7 +101,7 @@ const displayVideos = (videos) =>{
             ${video.others.posted_date ?.length == 0 ? "" : `<span class=" absolute right-2 bottom-2 bg-gray-800 rounded p-1 text-white text-xs "> ${getTimeString(video.others.posted_date)} </span>` }
             
         </figure>
-        <div class="px-0 py-2 flex gap-2">
+        <div class="px-0 py-2 flex gap-2 items-center">
            <div>
                 <img class="w-10 h-10 rounded-full object-cover "  src="${video.authors[0].profile_picture} " />
            </div>
